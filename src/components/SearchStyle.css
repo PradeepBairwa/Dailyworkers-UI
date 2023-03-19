@@ -1,0 +1,48 @@
+.search{
+    margin-left: 5rem;
+    margin-right: 5rem;
+    margin-top: -5%;
+}
+#header{
+    background-color: chocolate;
+}
+.dispname{
+    background-color: cadetblue;
+    color:cadetblue
+}
+.container{
+    border: 13px;
+    border-color: black;
+}
+.searchlabour{
+    width: 100%;
+    height: 60px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+.searchAddress {
+    width: 60%;
+    height: 60px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+.searchBtn{
+    height: 60px;
+    border-radius: 3px;
+}
+.card{
+    margin-top:-5rem;
+    margin-bottom: 20px;
+    margin-left: 1rem;
+    margin-right: 1rem;
+    border: border-0;
+   
+     
+}
+.title{
+    color: black;
+
+}
+.cardHeader{
+    width: 100%;
+}

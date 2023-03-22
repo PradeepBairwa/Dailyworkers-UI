@@ -1,20 +1,15 @@
-// import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
-import miniLogo from '../assets/Logo/minilogo.png'
-
-import { Grid,Paper, Avatar, TextField, Button, Typography,Link, FormControl, InputLabel, Input, InputAdornment, IconButton } from '@material-ui/core'
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-// import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
-import Signup from '../pages/Signup';
+import miniLogo from "../assets/Logo/minilogo.png";
+import { Button,Grid, Paper, Avatar, Typography, TextField, makeStyles, Checkbox, InputAdornment, IconButton, FormControlLabel } from '@material-ui/core'
 import { useState } from 'react';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { Alert, Stack } from '@mui/material';
+// import { Button } from 'reactstrap';
+import { signUp } from '../services/user-service';
+import { toast } from 'react-toastify';
+import { Link } from 'react-router-dom';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { KeyboardArrowRight } from '@material-ui/icons';
+import Signup from '../pages/Signup';
 
-import {Container, FormControlLabel, FormLabel, makeStyles, Radio, RadioGroup } from "@material-ui/core"
-import { KeyboardArrowRight } from "@material-ui/icons";
 const Login = (props) => {
   
   // console.log("Props in Login Modal",props);
@@ -33,49 +28,57 @@ const Login = (props) => {
   };
 
     //Data Binding..
-     const[loginData,setLoginData]=useState({
-        username:'',
-        password:''
-   });
-   const[error,setError]=useState({
-    errorType:'',
-    errorMessage:''
-   });
+     const[data,setData]=useState({
+        name:'',
+        password:'',
+        rememberMer:false
+    })
 
-   const handleChange=(event,property)=>{
-    //dynamic setting the values
-    
-      setLoginData({...loginData,[property]:event.target.value})
-      
-   }
+    const[error,setError]=useState({
+        errors:{},
+        isError:false
+    })
+
+
    const resetData=()=>{
-    setLoginData({
-      username:'',
-        password:''
+    setData({
+        name:'',
+        password:'',
+        rememberMer:false
+    })
+    setError({
+      isError:false
     })
    }
    
-   const submitForm=()=>{
-    console.log("submit...")
-    // event.preventDefault()
-    if(loginData.username==='' || loginData.password===''){
-      console.log("data "+loginData.username+","+loginData.password)
-      setError.errorType="error";
-      setError.errorMessage='Please enter Username and password';
-      console.log("hh"+setError.errorMessage +","+ setError.errorType)
-    }else{
-       setError.errorType='';
-       setError.errorMessage='';
+   const submitForm=(event)=>{
+        event.preventDefault()
+        // Validate data
+        // if(error.isError){
+        //     toast.error("Form Data Invalid");
+        //     setError({...error,isError:false})
+        //     return;
+        // }
+         console.log("data from submit :"+data.policyCheck);
+        
+        // Call API for sending data
+        signUp(data).then((response)=>{
+            console.log(response);
+            console.log("success log")
+            toast.success("User is Registered Successfully")
+            resetData();
+        }).catch((error)=>{
+            console.log(error);
+            toast.error(error.message);
+            toast.error(error.response.data.error)
+            setError({
+                errors:error,
+                isError:true
+            })
+            console.log("Error log");
+        })
+        console.log(data);
     }
-   
-
-    console.log("submitted  "+loginData.username+" , "+loginData.password +","+error.errorMessage);
-    resetData();
-    
-    //data validate
-
-    //call server API for the data
-   }
     //Data Binding
 const useStyles = makeStyles(() => {
   return {
@@ -89,76 +92,16 @@ const useStyles = makeStyles(() => {
     }
   }
 })
-    const classes = useStyles();
+const classes = useStyles();
 
-  const [formValues, setFormValues] = useState({
-    name:{
-      value:'',
-      error:false,
-      errorMessage:'You must enter a name'
-    },
-    name2:{
-      value:'',
-      error:false,
-      errorMessage:'You must enter a password'
+  
+  const handleChange=(event,property)=>{
+        // Dynamic setting the values
+        setData({...data,[property]:event.target.value})
+        console.log("from handel change "+data.policyCheck)
     }
-    
-  })
 
-  const resetData2=()=>{
-    setFormValues({
-       name:{
-      value:'',
-      error:false,
-      errorMessage:'You must enter a name'
-    },
-    name2:{
-      value:'',
-      error:false,
-      errorMessage:'You must enter a password'
-    }
-    })
-    console.log("Reset...")
-   }
-  const handleChange2 = (e) => {
-    const {name, value} = e.target;
-    setFormValues({
-      ...formValues,
-      [name]:{
-        ...formValues[name],
-        value
-      }
-    })
-  }
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    const formFields = Object.keys(formValues);
-    let newFormValues = {...formValues}
-
-    for (let index = 0; index < formFields.length; index++) {
-      const currentField = formFields[index];
-      const currentValue = formValues[currentField].value;
-
-      if(currentValue === ''){
-        newFormValues = {
-          ...newFormValues,
-          [currentField]:{
-            ...newFormValues[currentField],
-            error:true
-          }
-        }
-      }
-      
-    }
-      console.log("Values "+newFormValues.name);
-    setFormValues(newFormValues)
-    
-    
-  }
-  // console.log("form Values "+formValues.name.value,formValues.name2.value)
-  // console.log("form Values "+ formValues.name2.value)
   return (
     <div>
       <Modal show={props.show} onHide={props.close}> 
@@ -170,7 +113,7 @@ const useStyles = makeStyles(() => {
 
                 </Grid>
                 {/* New Input feilds start */}
-                <form noValidate onSubmit={handleSubmit} >
+                <form noValidate onSubmit={submitForm} >
                 <TextField 
             placeholder="Enter your name"
             label="Name"
@@ -179,15 +122,17 @@ const useStyles = makeStyles(() => {
             fullWidth
             required
             className={classes.field}
-            value={formValues.name.value}
-            onChange={handleChange2}
-            error={formValues.name.error}
-            helperText={formValues.name.error && formValues.name.errorMessage}
+            onChange={(e)=>handleChange(e,'name')} 
+            invalid={error.errors?.response?.data?.error ? true:false}
+            value={data.name}
+            error={error.errors?.response?.data?.name? true:false}
+            helperText={error.errors?.response?.data?.name}
+
           />
           <TextField 
-            placeholder="Enter your name"
+            placeholder="Enter your password"
             label="Password"
-            name="name2"
+            name="password"
             variant="outlined"
             fullWidth
             required
@@ -205,11 +150,11 @@ const useStyles = makeStyles(() => {
               </InputAdornment>
             }
             className={classes.field}
-            value={formValues.name2.value}
-            onChange={handleChange2}
-            error={formValues.name2.error}
-            helperText={formValues.name2.error && formValues.name2.errorMessage}
-            
+            onChange={(e)=>handleChange(e,'password')} 
+            invalid={error.errors?.response?.data?.error ? true:false}
+            value={data.password}
+            error={error.errors?.response?.data?.password? true:false}
+            helperText={error.errors?.response?.data?.password}
           />
           <FormControlLabel
                     control={
@@ -228,53 +173,14 @@ const useStyles = makeStyles(() => {
             // color="secondary"
             color='primary'
             variant="contained" 
-            style={btnstyle} fullWidth
+            style={btnstyle} 
+            fullWidth
             endIcon={<KeyboardArrowRight />}
           >
               SignIn
           </Button>
       </form>
 
-
-
-                {/* New Inpput feilds End */}
-                {/* Input feild */}
-                {/* <TextField label='Username' placeholder='Enter username' fullWidth required autoFocus
-                  onChange={(e)=>handleChange(e,'username')}
-                  value={loginData.username} 
-                />
-                
-                 <FormControl sx={{ m: 1, width: '100%' }} variant="standard" fullWidth>
-          <InputLabel htmlFor="standard-adornment-password">Password</InputLabel>
-          <Input
-            id="standard-adornment-password" 
-            type={showPassword ? 'text' : 'password'}
-            endAdornment={
-              <InputAdornment position="end">
-                <IconButton
-                  aria-label="toggle password visibility"
-                  onClick={handleClickShowPassword}
-                  onMouseDown={handleMouseDownPassword}
-                >
-                  {showPassword ? <Visibility /> : <VisibilityOff />}
-                </IconButton>
-              </InputAdornment>
-            }
-             onChange={(e)=>handleChange(e,'password')}
-             value={loginData.password}
-          />
-        </FormControl>
-                <FormControlLabel
-                    control={
-                    <Checkbox
-                        name="checkedB"
-                        color="primary"
-                    />
-                    }
-                    label="Remember me"
-                 />
-                <Button type='submit' color='primary' variant="contained" style={btnstyle} fullWidth
-                onClick={submitForm}>Sign in</Button> */}
                 <Typography >
                      <Link href="#" >
                         Forgot password ?

@@ -1,17 +1,17 @@
 
 import Modal from 'react-bootstrap/Modal';
 import miniLogo from "../assets/Logo/minilogo.png";
-import { Grid, Paper, Avatar, Typography, TextField, makeStyles, Checkbox } from '@material-ui/core'
+import { Button,Grid, Paper, Avatar, Typography, TextField, makeStyles } from '@material-ui/core'
 import { useState } from 'react';
-import { Button, Form, FormGroup, Label, Input, Container, Row, Col } from 'reactstrap';
+import {   Container, Row, Col } from 'reactstrap';
 import { signUp } from '../services/user-service';
 import { toast } from 'react-toastify';
 import Login from '../components/Login';
-import { Link } from 'react-router-dom';
-import { MDBCheckbox, MDBValidationItem } from 'mdb-react-ui-kit';
+import {  Link } from 'react-router-dom';
 
 const Signup = (props) => {
-  //  console.log("Props in Signup Modal",props);
+   console.log("Props in Signup Modal",props);
+   
     const paperStyle = { padding: '30px 10px', width: "100%", margin: "0px" }
     const avatarStyle = { backgroundColor: '#1bbd7e' }
     const [showLogin,setShowLogin]=useState(false);
@@ -72,7 +72,9 @@ const Signup = (props) => {
     const handleChange=(event,property)=>{
         // Dynamic setting the values
         setData({...data,[property]:event.target.value})
-        console.log("from handel change "+data.policyCheck)
+    }
+    const checkChange=(event,property)=>{
+      setData({...data,[property]:event.target.checked})
     }
     
 
@@ -84,8 +86,18 @@ const Signup = (props) => {
         //     setError({...error,isError:false})
         //     return;
         // }
-         console.log("data from submit :"+data.policyCheck);
-        
+       if(data.password!==data.confirmPassword){
+          setErrorFormat({
+            password:"password does not match",
+            confirmPasssword:'Password should match !!!'
+          })
+          return
+       } else{
+          setErrorFormat({
+            password:"",
+            confirmPasssword:''
+          })
+       }       
         // Call API for sending data
         signUp(data).then((response)=>{
             console.log(response);
@@ -108,7 +120,7 @@ const Signup = (props) => {
   return (
     <div>
     
-      <Modal show={props.show} onHide={props.close} >
+      <Modal show={props.show} onHide={props.close}>
         {/* <Modal.Header closeButton>
                  <Grid style={{marginBottom:"-20px"}} >
                     <Avatar style={avatarStyle} src={miniLogo}>
@@ -133,7 +145,7 @@ const Signup = (props) => {
                 <Row>
                     <Col >
 
-                        <Form onSubmit={submitForm}>
+                        <form onSubmit={submitForm}>
                         {/* Name Field */}
                         <TextField 
                               placeholder="Enter your full name"
@@ -226,8 +238,12 @@ const Signup = (props) => {
                               invalid={error.errors?.response?.data?.error ? true:false}
                               className={classes.field}
                               value={data.password}
-                              error={error.errors?.response?.data?.password? true:false}
-                              helperText={error.errors?.response?.data?.password}
+                              error={errorFormat.password?true:
+                                error.errors?.response?.data?.password? true:false
+                                }
+                              helperText={errorFormat.password?errorFormat.password:
+                                error.errors?.response?.data?.password
+                                }
                             />
                             
                         {/* Confirm Field */}
@@ -242,38 +258,41 @@ const Signup = (props) => {
                               invalid={error.errors?.response?.data?.error ? true:false}
                               className={classes.field}
                               value={data.confirmPassword}
-                              error={error.errors?.response?.data?.password? true:false}
-                              helperText={error.errors?.response?.data?.password}
+                              // error={error.errors?.response?.data?.password? true:false}
+                              // helperText={error.errors?.response?.data?.password}
+                              error={errorFormat.password?true:
+                                error.errors?.response?.data?.password? true:false
+                                }
+                              helperText={errorFormat.confirmPasssword?errorFormat.confirmPasssword:
+                                error.errors?.response?.data?.confirmPasssword
+                                }
                             />
-                            
-                        
-                            <FormGroup check>
-                            <Label check>
-                                <Input 
+                                <TextField 
                                 type="checkbox"
-                                name='policyCheck' 
-                                // required
-                                value={true}
-                                onChange={(e)=>handleChange(e,'policyCheck')}
-                                // checked={data.policyCheck===false ? setData({policyCheck:true}):setData({policyCheck:false})}
-                                // error={error.errors?.response?.data?.policyCheck? true:false}
-                                // helperText={error.errors?.response?.data?.policyCheck}
+                                name='policyCheck'                                 
+                                onChange={(e)=>checkChange(e,'policyCheck')}
+                                error={error.errors?.response?.data?.policyCheck? true:false}
+                                helperText={error.errors?.response?.data?.policyCheck}
                                 
                                 />
                                 I agree to the terms
-                            </Label>
-                            </FormGroup>
+                           
+                            
                             
                             <Container className='text-center'>
-                                <Button color='primary' onClick={resetData}>Reset</Button>
+                                <Button color='primary'
+                                 variant="contained" 
+                                 style={btnstyle}
+                                onClick={resetData}>Reset</Button>
                                 <Button className='ms-2'
                                  color='primary'
                                  variant="contained" 
                                  style={btnstyle}
+                                 type='submit'
                                 >Register</Button>
                             </Container>
                             
-                        </Form>
+                        </form>
                     </Col>
                 </Row>
             </Container>

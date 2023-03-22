@@ -4,7 +4,6 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Search from '../components/Search';
 import Services from '../components/Services';
-import Reg from '../components/Reg';
 
 const Home = () => {
   return (
@@ -14,7 +13,7 @@ const Home = () => {
     <Search/>
     {/* <About/> */}
     <Services/>
-    <Reg/>
+    
     <Footer/>
     </div>
   )
